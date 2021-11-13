@@ -42,9 +42,9 @@ def main():
         channelId=CHANNEL_ID,
         order="date"
     )
-    reponse_vid_id = request_vid_id.execute()
+    response_vid_id = request_vid_id.execute()
  
-    for item in reponse_vid_id['items']:
+    for item in response_vid_id['items']:
 
         vid_id = item['id']['videoId']
 
