@@ -5,7 +5,6 @@
 # https://developers.google.com/explorer-help/guides/code_samples#python
 
 import os
-import json
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -63,7 +62,7 @@ def main():
     
         ratio = likes / (likes + dislikes) * 100
         today = date.today()
-        currentDate = today.strftime("%b-%d-%Y")
+        current_date = today.strftime("%b-%d-%Y")
 
         text_original = "\n".join([
             "This is an automated comment to display likes & dislikes for the video you're currently watching,"
@@ -72,13 +71,12 @@ def main():
             f"Likes: {likes}",
             f"Dislikes: {dislikes}",
             f"Ratio: {round(ratio, 1)}%",
-            f"Last Updated: {currentDate}",
+            f"Last Updated: {current_date}",
             "YouTube, please don't ban or shadowban me. I learned how to do this from your own docs.",
             "Lol thanks."
         ])
 
         ### Get my stat comment
-        
         request_comment_id = youtube.commentThreads().list(
             part="snippet",
             moderationStatus="published",
