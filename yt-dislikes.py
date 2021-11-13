@@ -5,7 +5,6 @@
 # https://developers.google.com/explorer-help/guides/code_samples#python
 
 import os
-import json
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -68,7 +67,6 @@ def main():
         textOriginal = ("This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos. \nViews: " + views + "\nLikes: " + likes + "\nDislikes: " + dislikes + "\nRatio: " + str(round(ratio, 1)) + "%" + "\nLast Updated: " + currentDate + "\nYouTube, please don't ban or shadowban me. I learned how to do this from your own docs. \nLol thanks.")
 
         ### Get my stat comment
-        
         requestCommentId = youtube.commentThreads().list(
             part="snippet",
             moderationStatus="published",
