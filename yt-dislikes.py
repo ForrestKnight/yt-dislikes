@@ -37,81 +37,91 @@ def main():
         api_service_name, api_version, credentials=credentials)
 
     ### Get videoId list
-    requestVidId = youtube.search().list(
+    request_vid_id = youtube.search().list(
         part="snippet",
         channelId=CHANNEL_ID,
         order="date"
     )
-    responseVidId = requestVidId.execute()
+    reponse_vid_id = request_vid_id.execute()
  
-    for item in responseVidId['items']:
+    for item in reponse_vid_id['items']:
 
-        vidId = item['id']['videoId']
+        vid_id = item['id']['videoId']
 
         ### Get statistics
-        requestStats = youtube.videos().list(
+        request_stats = youtube.videos().list(
             part="statistics",
-            id=vidId
+            id=vid_id
         )
-        responseStats = requestStats.execute()
+        response_stats = request_stats.execute()
 
         # Format & display statistics
-        for item in responseStats['items']:
+        for item in response_stats['items']:
             views = item['statistics']['viewCount']
             likes = item['statistics']['likeCount']
             dislikes = item['statistics']['dislikeCount']
     
-        ratio = float(likes) / (float(likes) + float(dislikes)) * 100
+        ratio = likes / (likes + dislikes) * 100
         today = date.today()
         currentDate = today.strftime("%b-%d-%Y")
 
-        textOriginal = ("This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos. \nViews: " + views + "\nLikes: " + likes + "\nDislikes: " + dislikes + "\nRatio: " + str(round(ratio, 1)) + "%" + "\nLast Updated: " + currentDate + "\nYouTube, please don't ban or shadowban me. I learned how to do this from your own docs. \nLol thanks.")
+        text_original = "\n".join([
+            "This is an automated comment to display likes & dislikes for the video you're currently watching,"
+            "since YouTube decided to disable the dislike count on videos.",
+            f"Views: {views}",
+            f"Likes: {likes}",
+            f"Dislikes: {dislikes}",
+            f"Ratio: {round(ratio, 1)}%",
+            f"Last Updated: {currentDate}",
+            "YouTube, please don't ban or shadowban me. I learned how to do this from your own docs.",
+            "Lol thanks."
+        ])
 
         ### Get my stat comment
         
-        requestCommentId = youtube.commentThreads().list(
+        request_comment_id = youtube.commentThreads().list(
             part="snippet",
             moderationStatus="published",
             order="time",
             searchTerms=SEARCH_TERMS,
-            videoId=vidId
+            videoId=vid_id
         )
-        responseCommentId = requestCommentId.execute()
+        response_comment_id = request_comment_id.execute()
 
         ### Create or update stat comment
-        if responseCommentId["items"]:
-            for item in responseCommentId['items']:
-                commentId = item['id']
+        if response_comment_id["items"]:
+            for item in response_comment_id['items']:
+                comment_id = item['id']
                 # Update existing stat comment
-                requestUpdate = youtube.comments().update(
+                request_update = youtube.comments().update(
                     part="snippet",
                     body={
-                        "id": commentId,
+                        "id": comment_id,
                             "snippet": {
-                                "textOriginal": textOriginal
+                                "textOriginal": text_original
                         }
                     }
                 )
-                responseUpdate = requestUpdate.execute()
-                print(responseUpdate)
+                response_update = request_update.execute()
+                print(response_update)
         else:
             # Create new stat comment
-            requestComment = youtube.commentThreads().insert(
+            request_comment = youtube.commentThreads().insert(
                 part="snippet",
                 body={
                 "snippet": {
                     "topLevelComment": {
                     "snippet": {
-                        "textOriginal": textOriginal
+                        "textOriginal": text_original
                     }
                     },
                     "channelId": CHANNEL_ID,
-                    "videoId": vidId
+                    "videoId": vid_id
                 }
                 }
             )
-            responseComment = requestComment.execute()
-            print(responseComment)
+            response_comment = request_comment.execute()
+            print(response_comment)
                 
 if __name__ == "__main__":
     main()
