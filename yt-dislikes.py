@@ -40,7 +40,7 @@ def build_youtube_client(api_service_name, api_version, client_secrets_file) -> 
 def main():
     client: YoutubeClientAdapter = build_youtube_client("youtube", "v3", "YOUR_CLIENT_SECRET_FILE.json")
     for video in client.get_channel_videos(CHANNEL_ID):
-        ratio = round(100 * video.likeCount / (video.likeCount + video.dislikeCount))
+        ratio = 0 if video.likeCount == 0 else round(100 * video.likeCount / (video.likeCount + video.dislikeCount))
         date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         updated_comment_text = stat_comment.format(views=video.viewCount, likes=video.likeCount, dislikes=video.dislikeCount, ratio=ratio, date=date)
         print(updated_comment_text)
