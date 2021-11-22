@@ -13,7 +13,7 @@ class YoutubeClientAdapter:
         print(f"Fetched channel videos: {str([video.__dict__ for video in videos])}")
         return videos
 
-    def create_or_update_comment(self, updated_comment_text: str, video_id: str, search_terms: str, channel_id: str) -> None:
+    def create_or_update_comment(self, updated_comment_text: str, channel_id: str, video_id: str, search_terms: str) -> None:
         comments_response = self.list_comment_threads(part="snippet", videoId=video_id, search_terms=search_terms)
         print(f"Comments list response: {str(comments_response)}")
         if comments_response["items"]: # update stat comment
@@ -35,7 +35,8 @@ class YoutubeClientAdapter:
                     "topLevelComment": {
                         "snippet": { "textOriginal": updated_comment_text }
                     },
-                    "channelId": channel_id
+                    "channelId": channel_id,
+                    "videoId": video_id
                 }
             ) 
             print(f"Comment insert response {str(insert_response)}")

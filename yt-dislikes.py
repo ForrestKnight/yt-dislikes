@@ -44,7 +44,7 @@ def main():
         date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         updated_comment_text = stat_comment.format(views=video.viewCount, likes=video.likeCount, dislikes=video.dislikeCount, ratio=ratio, date=date)
         print(updated_comment_text)
-        client.create_or_update_comment(updated_comment_text, SEARCH_TERMS, video.channel_id)
+        client.create_or_update_comment(updated_comment_text, video.channel_id, video.id, SEARCH_TERMS)
                 
 if __name__ == "__main__":
     main()
