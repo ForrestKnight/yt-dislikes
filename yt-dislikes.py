@@ -4,8 +4,8 @@
 # See instructions for running these code samples locally:
 # https://developers.google.com/explorer-help/guides/code_samples#python
 
-from datetime import datetime
 import os
+from datetime import datetime
 
 import google_auth_oauthlib.flow
 import googleapiclient.discovery
@@ -14,19 +14,18 @@ from dotenv import load_dotenv
 
 from youtube_client_adapter import YoutubeClientAdapter
 
-load_dotenv()
 
+load_dotenv()
 CHANNEL_ID = os.getenv('CHANNEL_ID')
 SEARCH_TERMS = os.getenv('SEARCH_TERMS')
 API_KEY = os.getenv('API_KEY')
-
 scopes = ["https://www.googleapis.com/auth/youtube.force-ssl"]
 
 # Video statistics comment template which contains the following info
 # views, likes, dislikes, ratio, date
 stat_comment = "This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos. \nViews: {views}\nLikes: {likes}\nDislikes: {dislikes}\nRatio: {ratio}%\nLast Updated: {date}\nYouTube, please don't ban or shadowban me. I learned how to do this from your own docs. \nLol thanks."
 
-def build_youtube_client(api_service_name, api_version, client_secrets_file) -> YoutubeClientAdapter:
+def build_youtube_client(api_service_name: str, api_version: str, client_secrets_file: str) -> YoutubeClientAdapter:
     # Disable OAuthlib's HTTPS verification when running locally.
     # *DO NOT* leave this option enabled in production.
     # os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
