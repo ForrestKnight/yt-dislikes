@@ -15,7 +15,13 @@ class YoutubeClientAdapter:
         return videos
 
     def create_or_update_comment(self, updated_comment_text: str, channel_id: str, video_id: str, search_terms: str) -> None:
-        comments_response = self.list_comment_threads(part="snippet", videoId=video_id, search_terms=search_terms)
+        comments_response = self.list_comment_threads(
+            part="snippet",
+            moderationStatus="published",
+            videoId=video_id,
+            searchTerms=search_terms,
+            order="time"
+        )
         print(f"Comments list response: {str(comments_response)}")
         if comments_response["items"]: # update stat comment
             comment_id = comments_response["items"][0]["id"]
@@ -33,11 +39,13 @@ class YoutubeClientAdapter:
                 part="snippet",
                 key=self.api_key,
                 body={
-                    "topLevelComment": {
-                        "snippet": { "textOriginal": updated_comment_text }
-                    },
-                    "channelId": channel_id,
-                    "videoId": video_id
+                    "snippet": {
+                        "topLevelComment": {
+                            "snippet": { "textOriginal": updated_comment_text }
+                        },
+                        "channelId": channel_id,
+                        "videoId": video_id
+                    }
                 }
             ) 
             print(f"Comment insert response {str(insert_response)}")

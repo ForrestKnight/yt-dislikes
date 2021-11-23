@@ -5,6 +5,6 @@ from dataclasses import dataclass
 class YoutubeVideoMetadata:
     id: str
     channel_id: str
-    viewCount: int
-    likeCount: int
-    dislikeCount: int
+    view_count: int
+    like_count: int
+    dislike_count: int
