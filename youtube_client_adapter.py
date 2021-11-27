@@ -1,4 +1,4 @@
-from youtube_video_metadata import YoutubeVideoMetadata
+from youtube_video_metadata import YoutubeVideoMetadata, to_video_metadata
 
 
 class YoutubeClientAdapter:
@@ -9,8 +9,8 @@ class YoutubeClientAdapter:
     def get_channel_videos(self, channel_id: str) -> list[YoutubeVideoMetadata]:
         search_response = self.list_search_results(part="snippet", channelId=channel_id, type="video", order="date")
         video_ids = ",".join([item["id"]["videoId"] for item in search_response["items"]])
-        videos_response = self.list_videos(part="statistics", key=self.api_key, id=video_ids) # batch fetch
-        videos = [self.__to_video_metadata(item, channel_id) for item in videos_response["items"]]
+        videos_response = self.list_videos(part="statistics", key=self.api_key, id=video_ids)
+        videos = [to_video_metadata(item, channel_id) for item in videos_response["items"]]
         print(f"Fetched channel videos: {str([video.__dict__ for video in videos])}")
         return videos
 
@@ -35,7 +35,7 @@ class YoutubeClientAdapter:
             )
             print(f"Comment update response: {str(update_response)}")
         else: # create stat comment
-            insert_response = self.insert_comment(
+            insert_response = self.insert_comment_thread(
                 part="snippet",
                 key=self.api_key,
                 body={
@@ -50,18 +50,18 @@ class YoutubeClientAdapter:
             ) 
             print(f"Comment insert response {str(insert_response)}")
 
-    def insert_comment(self, **kwargs):
+    def insert_comment_thread(self, **kwargs):
         request = self.client.commentThreads().insert(**kwargs)
+        return request.execute()
+
+    def list_comment_threads(self, **kwargs):
+        request = self.client.commentThreads().list(**kwargs)
         return request.execute()
 
     def update_comment(self, **kwargs):
         request = self.client.comments().update(**kwargs)
         return request.execute()
  
-    def list_comment_threads(self, **kwargs):
-        request = self.client.commentThreads().list(**kwargs)
-        return request.execute()
-
     def list_search_results(self, **kwargs):
         request = self.client.search().list(**kwargs)
         return request.execute()
@@ -69,13 +69,3 @@ class YoutubeClientAdapter:
     def list_videos(self, **kwargs):
         request = self.client.videos().list(**kwargs)
         return request.execute()
-
-    def __to_video_metadata(self, video_response_item, channel_id: str) -> YoutubeVideoMetadata:
-        statistics = video_response_item["statistics"]
-        return YoutubeVideoMetadata(
-            video_response_item["id"],
-            channel_id,
-            int(statistics["viewCount"]),
-            int(statistics["likeCount"]),
-            int(statistics["dislikeCount"])
-        )
