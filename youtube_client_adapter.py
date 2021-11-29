@@ -1,3 +1,4 @@
+from typing import List
 from youtube_video_metadata import YoutubeVideoMetadata, to_video_metadata
 
 
@@ -6,7 +7,7 @@ class YoutubeClientAdapter:
         self.client = client
         self.api_key = api_key
 
-    def get_channel_videos(self, channel_id: str) -> list[YoutubeVideoMetadata]:
+    def get_channel_videos(self, channel_id: str) -> List[YoutubeVideoMetadata]:
         search_response = self.list_search_results(part="snippet", channelId=channel_id, type="video", order="date")
         video_ids = ",".join([item["id"]["videoId"] for item in search_response["items"]])
         videos_response = self.list_videos(part="statistics", key=self.api_key, id=video_ids)
