@@ -60,7 +60,10 @@ def main():
             likes = item['statistics']['likeCount']
             dislikes = item['statistics']['dislikeCount']
     
-        ratio = float(likes) / (float(likes) + float(dislikes)) * 100
+        if (float(likes) + float(dislikes)) == 0:
+            ratio = 0
+        else:
+            ratio = float(likes) / (float(likes) + float(dislikes)) * 100
         today = date.today()
         currentDate = today.strftime("%b-%d-%Y")
 
