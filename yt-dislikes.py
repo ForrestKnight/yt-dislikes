@@ -67,7 +67,15 @@ def main():
         today = date.today()
         currentDate = today.strftime("%b-%d-%Y")
 
-        textOriginal = ("This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos. \nViews: " + views + "\nLikes: " + likes + "\nDislikes: " + dislikes + "\nRatio: " + str(round(ratio, 1)) + "%" + "\nLast Updated: " + currentDate + "\nYouTube, please don't ban or shadowban me. I learned how to do this from your own docs. \nLol thanks.")
+        textOriginal = (
+            "This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos.\n"
+            f"Views: {views}\n"
+            f"Likes: {likes}\n"
+            f"Dislikes: {dislikes}\n"
+            f"Ratio {str(round(ratio, 1))}%\n"
+            f"Last Updated {currentDate}\n"
+            "YouTube, please don't ban or shadowban me. I learned how to do this from your own docs.\nLol thanks."
+        )
 
         ### Get my stat comment
         requestCommentId = youtube.commentThreads().list(
