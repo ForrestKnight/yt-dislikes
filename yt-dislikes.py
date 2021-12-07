@@ -39,80 +39,96 @@ def main():
     requestVidId = youtube.search().list(
         part="snippet",
         channelId=CHANNEL_ID,
-        order="date"
-    )
-    responseVidId = requestVidId.execute()
- 
-    for item in responseVidId['items']:
+        order="date",
+        maxResults=250
+    ).execute()
 
-        vidId = item['id']['videoId']
+    while requestVidId:
 
-        ### Get statistics
-        requestStats = youtube.videos().list(
-            part="statistics",
-            id=vidId
-        )
-        responseStats = requestStats.execute()
+        for item in requestVidId['items']:
 
-        # Format & display statistics
-        for item in responseStats['items']:
-            views = item['statistics']['viewCount']
-            likes = item['statistics']['likeCount']
-            dislikes = item['statistics']['dislikeCount']
-    
-        if (float(likes) + float(dislikes)) == 0:
-            ratio = 0
-        else:
-            ratio = float(likes) / (float(likes) + float(dislikes)) * 100
-        today = date.today()
-        currentDate = today.strftime("%b-%d-%Y")
+            vidId = item['id']['videoId']
 
-        textOriginal = ("This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos. \nViews: " + views + "\nLikes: " + likes + "\nDislikes: " + dislikes + "\nRatio: " + str(round(ratio, 1)) + "%" + "\nLast Updated: " + currentDate + "\nYouTube, please don't ban or shadowban me. I learned how to do this from your own docs. \nLol thanks.")
+            ### Get statistics
+            requestStats = youtube.videos().list(
+                part="statistics",
+                id=vidId
+            )
+            responseStats = requestStats.execute()
 
-        ### Get my stat comment
-        requestCommentId = youtube.commentThreads().list(
-            part="snippet",
-            moderationStatus="published",
-            order="time",
-            searchTerms=SEARCH_TERMS,
-            videoId=vidId
-        )
-        responseCommentId = requestCommentId.execute()
+            # Format & display statistics
+            for item in responseStats['items']:
+                views = item['statistics']['viewCount']
+                likes = item['statistics']['likeCount']
+                dislikes = item['statistics']['dislikeCount']
+        
+            if (float(likes) + float(dislikes)) == 0:
+                ratio = 0
+            else:
+                ratio = float(likes) / (float(likes) + float(dislikes)) * 100
+            today = date.today()
+            currentDate = today.strftime("%b-%d-%Y")
 
-        ### Create or update stat comment
-        if responseCommentId["items"]:
-            for item in responseCommentId['items']:
-                commentId = item['id']
-                # Update existing stat comment
-                requestUpdate = youtube.comments().update(
+            textOriginal = ("This is an automated comment to display likes & dislikes for the video you're currently watching, since YouTube decided to disable the dislike count on videos. \nViews: " + views + "\nLikes: " + likes + "\nDislikes: " + dislikes + "\nRatio: " + str(round(ratio, 1)) + "%" + "\nLast Updated: " + currentDate + "\nYouTube, please don't ban or shadowban me. I learned how to do this from your own docs. \nLol thanks.")
+
+            ### Get my stat comment
+            requestCommentId = youtube.commentThreads().list(
+                part="snippet",
+                moderationStatus="published",
+                order="time",
+                searchTerms=SEARCH_TERMS,
+                videoId=vidId
+            )
+            responseCommentId = requestCommentId.execute()
+
+            ### Create or update stat comment
+            if responseCommentId["items"]:
+                for item in responseCommentId['items']:
+                    commentId = item['id']
+                    # Update existing stat comment
+                    requestUpdate = youtube.comments().update(
+                        part="snippet",
+                        body={
+                            "id": commentId,
+                                "snippet": {
+                                    "textOriginal": textOriginal
+                            }
+                        }
+                    )
+                    responseUpdate = requestUpdate.execute()
+                    print(responseUpdate)
+            else:
+                # Create new stat comment
+                requestComment = youtube.commentThreads().insert(
                     part="snippet",
                     body={
-                        "id": commentId,
-                            "snippet": {
-                                "textOriginal": textOriginal
+                    "snippet": {
+                        "topLevelComment": {
+                        "snippet": {
+                            "textOriginal": textOriginal
                         }
+                        },
+                        "channelId": CHANNEL_ID,
+                        "videoId": vidId
+                    }
                     }
                 )
-                responseUpdate = requestUpdate.execute()
-                print(responseUpdate)
-        else:
-            # Create new stat comment
-            requestComment = youtube.commentThreads().insert(
-                part="snippet",
-                body={
-                "snippet": {
-                    "topLevelComment": {
-                    "snippet": {
-                        "textOriginal": textOriginal
-                    }
-                    },
-                    "channelId": CHANNEL_ID,
-                    "videoId": vidId
-                }
-                }
-            )
-            responseComment = requestComment.execute()
-            print(responseComment)
+                responseComment = requestComment.execute()
+                print(responseComment)
+
+        try:
+            if 'nextPageToken' in requestVidId:
+                requestVidId = youtube.search().list(
+                    part="snippet",
+                    channelId=CHANNEL_ID,
+                    order="date",
+                    maxResults=250,
+                    pageToken=requestVidId['nextPageToken']
+                ).execute()
+            else:
+                break
+        except:
+            break
                 
 if __name__ == "__main__":
     main()
