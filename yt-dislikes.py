@@ -40,7 +40,7 @@ def main():
         part="snippet",
         channelId=CHANNEL_ID,
         order="date",
-        maxResults=250
+        maxResults=50
     ).execute()
 
     while requestVidId:
@@ -122,7 +122,7 @@ def main():
                     part="snippet",
                     channelId=CHANNEL_ID,
                     order="date",
-                    maxResults=250,
+                    maxResults=50,
                     pageToken=requestVidId['nextPageToken']
                 ).execute()
             else:
